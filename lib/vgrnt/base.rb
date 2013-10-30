@@ -35,7 +35,7 @@ module Vgrnt
         machine_status = `VBoxManage showvminfo #{machine_id} --machinereadable`
 
         # Forwarding(0)="ssh,tcp,127.0.0.1,2222,,22"
-        ssh_info = machine_status.scan( /^Forwarding\(0\)="ssh,tcp,([0-9.]+),([0-9]+),/ ).first
+        ssh_info = machine_status.scan( /^Forwarding\(\d+\)="ssh,tcp,([0-9.]+),([0-9]+),/ ).first
 
         machines[machine_name] = {
             :id =>  machine_id,

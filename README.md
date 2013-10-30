@@ -3,8 +3,16 @@ vgrnt
 
 [![Gem Version](https://badge.fury.io/rb/vgrnt.png)](http://badge.fury.io/rb/vgrnt)
 
-`vgrnt` is a partial reimplementation of `vagrant` command, with a goal to
-speed up a few common operations that I found unbearably slow. 
+`vgrnt` is a partial reimplementation of a few `vagrant` operations that I
+found to be unbearably slow. For example:
+
+```bash
+time vagrant ssh -- '/bin/true'
+#    real  0m1.969s
+
+time vgrnt ssh -- '/bin/true'
+#    real  0m0.538s
+```
 
 It achieves this by naively reimplementing these commands, without requiring
 superfluous gems (not even vagrant) or parsing the Vagrantfile. Given how
@@ -42,7 +50,7 @@ the VM ID (eg 0398e43a-d35f-4c84-bc81-6807f5d11262) in the right spot.
 
 ```
 vgrnt vboxmanage showvminfo --details
-# =>    VBoxManage showvminfo 0398e43a-d35f-4c84-bc81-6807f5d11262 --details
+# =>    equivalent to: VBoxManage showvminfo 0398e43a-d35f-4c84-bc81-6807f5d11262 --details
 
 vgrnt vboxmanage vm-name showvminfo   # supports multi-vm environments
 ```
@@ -58,7 +66,7 @@ vgrnt vboxmanage metrics query VM_ID
 
 ## TODO
 
-* vgrnt status (pull it out from vboxmanage)
+* vgrnt status (can pull it out from vboxmanage)
 * vgrnt reprovision (equivalent to running `vagrant ssh -- chef-solo /tmp...`
 * vgrnt destroy (how hard is it to kill a VM??)
 * vgrnt snapshot (it's currently implemented as a vagrant plugin, but who needs decoupling?)

@@ -1,0 +1,167 @@
+  list [--long|-l]          vms|runningvms|ostypes|hostdvds|hostfloppies|
+                            bridgedifs|hostonlyifs|dhcpservers|hostinfo|
+                            hostcpuids|hddbackends|hdds|dvds|floppies|
+                            usbhost|usbfilters|systemproperties|extpacks|
+                            groups
+
+  registervm                <filename>
+
+  createvm                  --name <name>
+                            [--groups <group>, ...]
+                            [--ostype <ostype>]
+                            [--register]
+                            [--basefolder <path>]
+                            [--uuid <uuid>]
+
+  import                    <ovf/ova>
+                            [--dry-run|-n]
+                            [--options keepallmacs|keepnatmacs]
+                            [more options]
+                            (run with -n to have options displayed
+                             for a particular OVF)
+
+  export                    <machines> --output|-o <name>.<ovf/ova>
+                            [--legacy09|--ovf09|--ovf10|--ovf20]
+                            [--manifest]
+                            [--vsys <number of virtual system>]
+                                    [--product <product name>]
+                                    [--producturl <product url>]
+                                    [--vendor <vendor name>]
+                                    [--vendorurl <vendor url>]
+                                    [--version <version info>]
+                                    [--eula <license text>]
+                                    [--eulafile <filename>]
+
+  closemedium               disk|dvd|floppy <uuid>|<filename>
+                            [--delete]
+
+  createhd                  --filename <filename>
+                            [--size <megabytes>|--sizebyte <bytes>]
+                            [--diffparent <uuid>|<filename>
+                            [--format VDI|VMDK|VHD] (default: VDI)
+                            [--variant Standard,Fixed,Split2G,Stream,ESX]
+  clonehd                   <uuid>|<filename> <uuid>|<outputfile>
+                            [--format VDI|VMDK|VHD|RAW|<other>]
+                            [--variant Standard,Fixed,Split2G,Stream,ESX]
+                            [--existing]
+
+  convertfromraw            <filename> <outputfile>
+                            [--format VDI|VMDK|VHD]
+                            [--variant Standard,Fixed,Split2G,Stream,ESX]
+                            [--uuid <uuid>]
+  convertfromraw            stdin <outputfile> <bytes>
+                            [--format VDI|VMDK|VHD]
+                            [--variant Standard,Fixed,Split2G,Stream,ESX]
+                            [--uuid <uuid>]
+
+  getextradata              global|<uuid>|<name>
+                            <key>|enumerate
+
+  setextradata              global|<uuid>|<name>
+                            <key>
+                            [<value>] (no value deletes key)
+
+  setproperty               machinefolder default|<folder> |
+                            vrdeauthlibrary default|<library> |
+                            websrvauthlibrary default|null|<library> |
+                            vrdeextpack null|<library> |
+                            autostartdbpath null|<folder> |
+                            loghistorycount <value>
+
+  usbfilter                 add <index,0-N>
+                            --target <uuid>|<name>|global
+                            --name <string>
+                            --action ignore|hold (global filters only)
+                            [--active yes|no] (yes)
+                            [--vendorid <XXXX>] (null)
+                            [--productid <XXXX>] (null)
+                            [--revision <IIFF>] (null)
+                            [--manufacturer <string>] (null)
+                            [--product <string>] (null)
+                            [--remote yes|no] (null, VM filters only)
+                            [--serialnumber <string>] (null)
+                            [--maskedinterfaces <XXXXXXXX>]
+
+  usbfilter                 modify <index,0-N>
+                            --target <uuid>|<name>|global
+                            [--name <string>]
+                            [--action ignore|hold] (global filters only)
+                            [--active yes|no]
+                            [--vendorid <XXXX>|""]
+                            [--productid <XXXX>|""]
+                            [--revision <IIFF>|""]
+                            [--manufacturer <string>|""]
+                            [--product <string>|""]
+                            [--remote yes|no] (null, VM filters only)
+                            [--serialnumber <string>|""]
+                            [--maskedinterfaces <XXXXXXXX>]
+
+  usbfilter                 remove <index,0-N>
+                            --target <uuid>|<name>|global
+
+  sharedfolder              add <vmname>|<uuid>
+                            --name <name> --hostpath <hostpath>
+                            [--transient] [--readonly] [--automount]
+
+  sharedfolder              remove <vmname>|<uuid>
+                            --name <name> [--transient]
+
+  guestproperty             get <vmname>|<uuid>
+                            <property> [--verbose]
+
+  guestproperty             set <vmname>|<uuid>
+                            <property> [<value> [--flags <flags>]]
+
+  guestproperty             enumerate <vmname>|<uuid>
+                            [--patterns <patterns>]
+
+  guestproperty             wait <vmname>|<uuid> <patterns>
+                            [--timeout <msec>] [--fail-on-timeout]
+
+  metrics                   list [*|host|<vmname> [<metric_list>]]
+                                                 (comma-separated)
+
+  metrics                   setup
+                            [--period <seconds>] (default: 1)
+                            [--samples <count>] (default: 1)
+                            [--list]
+                            [*|host|<vmname> [<metric_list>]]
+
+  metrics                   query [*|host|<vmname> [<metric_list>]]
+
+  metrics                   enable
+                            [--list]
+                            [*|host|<vmname> [<metric_list>]]
+
+  metrics                   disable
+                            [--list]
+                            [*|host|<vmname> [<metric_list>]]
+
+  metrics                   collect
+                            [--period <seconds>] (default: 1)
+                            [--samples <count>] (default: 1)
+                            [--list]
+                            [--detach]
+                            [*|host|<vmname> [<metric_list>]]
+
+  hostonlyif                ipconfig <name>
+                            [--dhcp |
+                            --ip<ipv4> [--netmask<ipv4> (def: 255.255.255.0)] |
+                            --ipv6<ipv6> [--netmasklengthv6<length> (def: 64)]]
+                            create |
+                            remove <name>
+
+  dhcpserver                add|modify --netname <network_name> |
+                                       --ifname <hostonly_if_name>
+                            [--ip <ip_address>
+                            --netmask <network_mask>
+                            --lowerip <lower_ip>
+                            --upperip <upper_ip>]
+                            [--enable | --disable]
+
+  dhcpserver                remove --netname <network_name> |
+                                   --ifname <hostonly_if_name>
+
+  extpack                   install [--replace] <tarball> |
+                            uninstall [--force] <name> |
+                            cleanup

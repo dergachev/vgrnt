@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+
+if $0 == __FILE__
+    $:.unshift File.expand_path('../../lib', __FILE__)
+end
+puts File.expand_path('../../lib', __FILE__)
+
+require 'vgrnt'
+
+raise "vgrnt: must be run from vagrant project root" unless File.exists? 'Vagrantfile'
+Vgrnt::App.start

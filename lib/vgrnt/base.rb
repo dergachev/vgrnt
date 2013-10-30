@@ -35,11 +35,12 @@ module Vgrnt
         machine_status = `VBoxManage showvminfo #{machine_id} --machinereadable`
 
         # Forwarding(0)="ssh,tcp,127.0.0.1,2222,,22"
-        ssh_info = machine_status.scan( /^Forwarding\(\d+\)="ssh,tcp,([0-9.]+),([0-9]+),/ ).first
+        # Forwarding(1)="ssh,tcp,,2222,,22"
+        ssh_info = machine_status.scan( /^Forwarding\(\d+\)="ssh,tcp,([0-9.]*),([0-9]+),/ ).first
 
         machines[machine_name] = {
             :id =>  machine_id,
-            :ssh_ip => ssh_info[0],
+            :ssh_ip => ssh_info[0].empty? ? '127.0.0.1' : ssh_info[0],
             :ssh_port => ssh_info[1],
             :state => machine_status.scan( /^VMState="(.*)"$/ ).first.first   # VMState="running"
         }
@@ -48,8 +49,6 @@ module Vgrnt
       return machines
     end
   end
-
-
 
   class App < Thor
 

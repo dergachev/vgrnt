@@ -1,7 +1,7 @@
-vgrnt
+vgrnt [![Gem Version](https://badge.fury.io/rb/vgrnt.png)](http://badge.fury.io/rb/vgrnt) [![Build Status](https://travis-ci.org/dergachev/vgrnt.png)](https://travis-ci.org/dergachev/vgrnt)
 =====
 
-[![Gem Version](https://badge.fury.io/rb/vgrnt.png)](http://badge.fury.io/rb/vgrnt)
+
 
 `vgrnt` is a partial reimplementation of a few `vagrant` operations that I
 found to be unbearably slow. For example:

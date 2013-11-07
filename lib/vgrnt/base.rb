@@ -1,18 +1,24 @@
 require 'thor'
+require 'open3'
 
 module Vgrnt
   class Logger
 
+    def stdout(str)
+      $stdout.puts str unless str.empty?
+    end
+
     def notice(str)
-      $stderr.puts str
+      $stderr.puts str unless str.empty?
     end
 
     def debug(str)
-      $stderr.puts str if ENV['VAGRANT_LOG'] == 'debug'
+      $stderr.puts str if !str.empty? && ENV['VAGRANT_LOG'] == 'debug'
     end
 
     def error(str)
-      $stderr.puts "\e[31m" + str + "\e[0m"  # terminal codes for red
+      # terminal codes for red
+      $stderr.puts "\e[31m" + str + "\e[0m" unless str.empty?
     end
   end
 
@@ -24,30 +30,50 @@ module Vgrnt
     end
   end
 
+  # TODO testing - stubout VBoxManage showvminfo (use fixtures for its output),
+  # then write unit tests for getRunningMachines (consider using erb file for the fixtures)
   class Util
-    def self.getRunningMachines
+    def self.machineSSH(target)
+      machine = self.runningMachines()[target]
+      return nil unless machine && machine[:state] == 'running'
+
+      # Forwarding(0)="ssh,tcp,127.0.0.1,2222,,22"
+      # Forwarding(1)="ssh,tcp,,2222,,22"
+      ssh_info = machine[:showvminfo].scan( /^Forwarding\(\d+\)="ssh,tcp,([0-9.]*),([0-9]+),/ ).first
+
+      return {
+          :ssh_ip => ssh_info[0].empty? ? '127.0.0.1' : ssh_info[0],
+          :ssh_port => ssh_info[1]
+      }
+    end
+
+    def self.showvminfo_command(machine_id)
+      return "VBoxManage showvminfo #{machine_id} --machinereadable"
+    end
+
+    def self.showvminfo(machine_id)
+      return `#{self.showvminfo_command(machine_id)}`
+    end
+
+    def self.runningMachines
       machines = {}
 
       ids = Dir.glob(".vagrant/machines/*/*/id")
       ids.each do |id_file|
         machine_name = id_file[ /^.vagrant\/machines\/(\w+)\/\w+\/id$/ ,1]
         machine_id = IO.read(id_file)
-        machine_status = `VBoxManage showvminfo #{machine_id} --machinereadable`
-
-        # Forwarding(0)="ssh,tcp,127.0.0.1,2222,,22"
-        # Forwarding(1)="ssh,tcp,,2222,,22"
-        ssh_info = machine_status.scan( /^Forwarding\(\d+\)="ssh,tcp,([0-9.]*),([0-9]+),/ ).first
+        
+        machine_info = self.showvminfo(machine_id)
 
         machines[machine_name] = {
             :id =>  machine_id,
-            :ssh_ip => ssh_info[0].empty? ? '127.0.0.1' : ssh_info[0],
-            :ssh_port => ssh_info[1],
-            :state => machine_status.scan( /^VMState="(.*)"$/ ).first.first   # VMState="running"
+            :showvminfo => machine_info,
+            :state => machine_info.scan( /^VMState="(.*)"$/ ).first.first   # VMState="running"
         }
       end
-      # puts machines.inspect
       return machines
     end
+
   end
 
   class App < Thor
@@ -69,15 +95,16 @@ module Vgrnt
       if File.exists?(".vgrnt-sshconfig")
         @logger.debug "Using .vgrnt-sshconf"
         ssh_command = "ssh -F .vgrnt-sshconfig #{target_vm} #{args.join(' ')}"
-      else 
+      else
         @logger.debug ".vgrnt-sshconfig file not found; using VBoxManage to get connection info."
-        machine = Util::getRunningMachines()[target_vm]
+        machine = Util::runningMachines()[target_vm]
+        ssh_info = Util::machineSSH(target_vm)
 
-        if machine && machine[:state] == 'running' 
+        if machine && machine[:state] == 'running'
           # found by running "VAGRANT_LOG=debug vagrant ssh"
           default_ssh_args = [
-            "vagrant@#{machine[:ssh_ip]}", 
-            "-p", machine[:ssh_port], 
+            "vagrant@#{ssh_info[:ssh_ip]}", 
+            "-p", ssh_info[:ssh_port], 
             "-o", "DSAAuthentication=yes", "-o", "LogLevel=FATAL", "-o", "StrictHostKeyChecking=no", 
             "-o", "UserKnownHostsFile=/dev/null", "-o", "IdentitiesOnly=yes", 
             "-i", "~/.vagrant.d/insecure_private_key"
@@ -90,7 +117,7 @@ module Vgrnt
         end
       end
 
-      exec ssh_command
+      puts `#{ssh_command}`
     end
 
     desc "ssh-config [vm-name]", "Store output of 'vagrant ssh-config' to .vgrnt-sshconfig"
@@ -98,7 +125,7 @@ module Vgrnt
       output = `vagrant ssh-config #{target}`
       if $? && !output.empty?
         IO.write('.vgrnt-sshconfig', output)
-        @logger.notice "Created ./.vgrnt-sshconfig with the following:", output
+        @logger.notice "Created ./.vgrnt-sshconfig with the following: " + output
       else
         @logger.error "Call to 'vagrant ssh-config' failed."
         exit 1
@@ -134,7 +161,7 @@ module Vgrnt
 
       # of form `VBoxManage showvminfo uuid|name ...`
       vboxmanage_commands_standard = vboxmanage_commands_all - vboxmanage_commands_special
-      machine = Util::getRunningMachines()[target_vm]
+      machine = Util::runningMachines()[target_vm]
       if !machine
         @logger.error "The specified target vm (#{target_vm}) has not been started."
         exit 1
@@ -148,9 +175,6 @@ module Vgrnt
       else
         # TODO: handle substitution for commands like `usbfilter add 0 --target <uuid|name>`
 
-        # @logger.error "Support for non-standard vboxmanage commands (such as #{vboxmanage_subcommand}) is not implemented yet."
-        # exit 1
-
         @logger.debug "Non-standard vboxmanage command detected (#{vboxmanage_subcommand}). Substituting 'VM_ID' for VM id."
         
         # [VM_ID] is an optional literal token which will be replaced by the UUID of the VM referenced by Vagrant
@@ -160,12 +184,10 @@ module Vgrnt
 
       @logger.debug "Executing: #{command}"
       #TODO: windows support (path to VBoxManage.exe")
-      exec command
+      Open3.popen3(command) do |stdin, stdout, stderr|
+        @logger.stdout stdout.read
+        @logger.error stderr.read
+      end
     end
   end
 end
-
-# if __FILE__ == $0
-#   raise "vgrnt: must be run from vagrant project root" unless File.exists? 'Vagrantfile'
-#   Vgrnt::App.start
-# end

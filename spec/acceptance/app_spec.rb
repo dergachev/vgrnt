@@ -3,22 +3,27 @@ require 'acceptance/support/acceptance_helper'
 describe Vgrnt::App do
 
   context "when running from ./spec/acceptance/fixtures/simple" do
-    let (:vagrant_homedir) { 'spec/acceptance/fixtures/simple' }
+    before(:all) { vagrant_up }
+
+    def in_vagrant_env(&block)
+      in_vagrant_env_dir('spec/acceptance/fixtures/simple', &block)
+    end
 
     describe "#ssh" do
       it 'works with default VM specified explicitly' do
         output = capture_in_vagrant_env(:stdout) { Vgrnt::App.start(['ssh', 'default', '--', 'whoami']) }
-        expect(output).to eq "vagrant\n" 
+        expect(output).to eq "vagrant\n"
       end
 
       it 'works with default VM specified implicitly' do
         output = capture_in_vagrant_env(:stdout) { Vgrnt::App.start(['ssh', '--',  'whoami']) }
-        expect(output).to eq "vagrant\n" 
+        expect(output).to eq "vagrant\n"
       end
     end
 
     describe "#ssh-config", :slow do
 
+      vagrant_homedir_variable = 'spec/acceptance/fixtures/simple'
       before(:all) { delete_in_vagrant_env '.vgrnt-sshconfig' }
       after(:all) { delete_in_vagrant_env '.vgrnt-sshconfig' }
 
@@ -30,7 +35,7 @@ describe Vgrnt::App do
 
       it "works with #ssh" do
         output = capture_in_vagrant_env(:stdout) { Vgrnt::App.start(['ssh', 'default', '--', 'whoami']) }
-        expect(output).to eq "vagrant\n" 
+        expect(output).to eq "vagrant\n"
       end
     end
 

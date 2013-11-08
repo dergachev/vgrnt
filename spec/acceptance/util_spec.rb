@@ -25,11 +25,11 @@ describe Vgrnt::Util do
   end
     
   context "when running from ./spec/acceptance/fixtures/simple" do
-    let (:vagrant_homedir) { 'spec/acceptance/fixtures/simple' }
-
-    before :all do
-      in_vagrant_env { `vagrant up` unless Vgrnt::Util::runningMachines()['default'][:state] == 'running' }
+    def in_vagrant_env(&block)
+      in_vagrant_env_dir './spec/acceptance/fixtures/simple', &block
     end
+
+    before(:all) { vagrant_up }
 
     describe "::runningMachines" do
       it 'ensure .vgrnt directory exists' do

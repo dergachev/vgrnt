@@ -16,17 +16,31 @@ module AcceptanceExampleGroup
     result
   end
 
-  def capture_in_vagrant_env(stream=nil, &block)
-    capture(stream) { in_vagrant_env &block }
+  def in_vagrant_env_dir(vagrant_homedir, &block)
+    # unless (vagrant_homedir)
+    #   vagrant_homedir = './spec/acceptance/fixtures/simple'
+    # end
+    Dir.chdir( vagrant_homedir, &block)
   end
 
-  def in_vagrant_env(&block)
-    Dir.chdir( vagrant_homedir, &block)
+  def capture_in_vagrant_env(stream=nil, &block)
+    capture(stream) { in_vagrant_env &block }
   end
 
   def delete_in_vagrant_env(file)
     in_vagrant_env { File.delete(file) if File.exists?(file) }
   end
+
+  def vagrant_up
+    in_vagrant_env do
+      s = Vgrnt::Util::runningMachines()
+      # raise s['default'].inspect
+      unless s && s['default'] && s['default'][:state] == 'running'
+         `vagrant up`
+      end
+    end
+  end
+
 end
 
 RSpec.configure do |config|

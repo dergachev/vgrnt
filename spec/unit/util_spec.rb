@@ -4,10 +4,10 @@ require 'spec_helper'
 #     c.include Helpers
 # end
 
-describe Vgrnt::Util do
+describe Vgrnt::Util::VirtualBox do
   describe "::showvminfo_command" do
     it 'should generate VBoxManage command' do
-      expect(Vgrnt::Util::showvminfo_command('test')).to eq 'VBoxManage showvminfo test --machinereadable'
+      expect(Vgrnt::Util::VirtualBox::showvminfo_command('test')).to eq 'VBoxManage showvminfo test --machinereadable'
     end
   end
 end

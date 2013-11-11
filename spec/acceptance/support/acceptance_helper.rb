@@ -33,7 +33,7 @@ module AcceptanceExampleGroup
 
   def vagrant_up
     in_vagrant_env do
-      s = Vgrnt::Util::runningMachines()
+      s = Vgrnt::Util::VirtualBox::runningMachines()
       # raise s['default'].inspect
       unless s && s['default'] && s['default'][:state] == 'running'
          `vagrant up`

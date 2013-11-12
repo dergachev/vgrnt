@@ -19,3 +19,28 @@ end
 
 desc 'Default task which runs all specs'
 task :default => 'spec:unit'
+
+desc "Start all VMs required by tests"
+task "acceptance:prepare" do
+  Dir["spec/acceptance/fixtures/{simple,multivm}"].each do |d|
+    # not doing this in parallel / background due to Vagrant bug
+    # see https://github.com/mitchellh/vagrant/pull/2484
+    Dir.chdir(d) do |d|
+      puts "In " + `pwd`
+      sh "VAGRANT_NO_PLUGINS=1 vagrant up"
+    end
+  end
+end
+
+desc "Stop all VMs started by tests"
+task "acceptance:clean" do
+  Dir["spec/acceptance/fixtures/*"].each do |d|
+    Dir.chdir(d) do |d|
+      Dir[".vagrant/machines/*"].each do |name|
+        name = File.basename(name)
+        puts "In " + `pwd`
+        sh "VAGRANT_NO_PLUGINS=1 vagrant destroy #{name} -f > /dev/null &"
+      end
+    end
+  end
+end

@@ -55,5 +55,47 @@ describe Vgrnt::App do
         expect(output).to include "Name: /VirtualBox/GuestInfo/OS/Product"
       end
     end
+
+    describe "#status" do
+      it "correctly identifies running machines" do
+        # default                   saved (virtualbox)
+        output = capture_in_vagrant_env(:stdout) { Vgrnt::App.start(['status']) }
+        expect(output).to match /default +running \(virtualbox\)/
+      end
+
+      it "is identical to 'vagrant status'", :slow do
+        # default                   saved (virtualbox)
+        vagrant_output = capture_in_vagrant_env(:stdout) { puts `vagrant status | grep '(virtualbox)$'` }
+        expect(vagrant_output).to match /default +running \(virtualbox\)/
+
+        vgrnt_output = capture_in_vagrant_env(:stdout) { Vgrnt::App.start(['status']) }
+        expect(vgrnt_output).to include(vagrant_output)
+      end
+    end
+  end
+
+  context "when running from ./spec/acceptance/fixtures/neveron" do
+    before(:all) { vagrant_destroy }
+
+    def in_vagrant_env(&block)
+      in_vagrant_env_dir('spec/acceptance/fixtures/neveron', &block)
+    end
+
+    describe "#status" do
+      it "correctly identifies not created machines" do
+        # default                   saved (virtualbox)
+        output = capture_in_vagrant_env(:stdout) { Vgrnt::App.start(['status']) }
+        expect(output).to match /default +not created \(virtualbox\)/
+      end
+
+      it "is identical to 'vagrant status'", :slow do
+        # default                   saved (virtualbox)
+        vagrant_output = capture_in_vagrant_env(:stdout) { puts `vagrant status | grep '(virtualbox)$'` }
+        expect(vagrant_output).to match /default +not created \(virtualbox\)/
+
+        vgrnt_output = capture_in_vagrant_env(:stdout) { Vgrnt::App.start(['status']) }
+        expect(vgrnt_output).to include(vagrant_output)
+      end
+    end
   end
 end

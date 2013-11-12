@@ -41,6 +41,15 @@ module AcceptanceExampleGroup
     end
   end
 
+  def vagrant_destroy
+    in_vagrant_env do
+      s = Vgrnt::Util::VirtualBox::runningMachines()
+      if s && s['default'] && s['default'] && ([nil, "poweroff"].include? s['default'][:state])
+         `vagrant destroy -f`
+      end
+    end
+  end
+
 end
 
 RSpec.configure do |config|

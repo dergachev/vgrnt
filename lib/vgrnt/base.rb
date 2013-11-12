@@ -1,6 +1,7 @@
 require 'thor'
 require 'open3'
 require 'vgrnt/util/virtualbox'
+require 'vgrnt/util/vagrantfile'
 
 module Vgrnt
   class Logger
@@ -85,6 +86,24 @@ module Vgrnt
       else
         @logger.error "Call to 'vagrant ssh-config' failed."
         exit 1
+      end
+    end
+
+    desc "status [vm-name]", "Wrapper on vagrant status"
+    def status(target_vm = 'default')
+      machines = Util::VirtualBox::runningMachines()
+
+      puts "Current machine states (as detected by vgrnt):\n\n"
+      machines.each do |machine_name, machine|
+        puts "#{machine_name.ljust(25)} #{machine[:state]} (virtualbox)"
+      end
+      defined_vms = Util::Vagrantfile::defined_vms()
+
+      defined_vms.each do |machine_name|
+        machine_name = machine_name.to_s   # they're usually symbols
+        if !machines[machine_name]
+          puts "#{machine_name.ljust(25)} not created (virtualbox)"
+        end
       end
     end
 

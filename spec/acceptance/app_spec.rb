@@ -91,4 +91,24 @@ describe Vgrnt::App do
       end
     end
   end
+
+  context "when running in fixtures/multivm" do
+    before(:all) { vagrant_up('./spec/acceptance/fixtures/multivm') }
+    let(:vagrant_path) { './spec/acceptance/fixtures/multivm' }
+
+    describe "#status" do
+      it "correctly identifies MULTIPLE running machines" do
+        # default                   saved (virtualbox)
+        output = vagrant_stdout { Vgrnt::App.start(['status']) }
+        expect(output).to match /^vm1 +running \(virtualbox\)/
+        expect(output).to match /^vm2 +running \(virtualbox\)/
+      end
+    end
+
+    describe "#ssh" do
+      it 'works with multivm environments' do
+        expect(vagrant_stdout { Vgrnt::App.start(%w{ssh vm1 -- whoami}) }).to eq "vagrant\n"
+      end
+    end
+  end
 end

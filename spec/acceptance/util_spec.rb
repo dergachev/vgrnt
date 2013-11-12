@@ -1,11 +1,12 @@
 require 'acceptance/support/acceptance_helper'
 
 describe "VBoxManage environment" do
-  def in_vagrant_env(&block)
-    in_vagrant_env_dir './spec/acceptance/fixtures/simple', &block
-  end
+  # def in_vagrant_env(&block)
+  #   in_vagrant_env_dir './spec/acceptance/fixtures/simple', &block
+  # end
 
-  before(:all) { vagrant_up }
+  before(:all) { vagrant_up('./spec/acceptance/fixtures/simple') }
+  let(:vagrant_path) { './spec/acceptance/fixtures/simple' }
 
   it 'ensure we can execute VBoxManage' do
     return_code = system("VBoxManage list vms > /dev/null")
@@ -25,11 +26,8 @@ end
 describe Vgrnt::Util::VirtualBox do
 
   context "when running from ./spec/acceptance/fixtures/simple" do
-    def in_vagrant_env(&block)
-      in_vagrant_env_dir './spec/acceptance/fixtures/simple', &block
-    end
-
-    before(:all) { vagrant_up }
+    before(:all) { vagrant_up('./spec/acceptance/fixtures/simple') }
+    let(:vagrant_path) { './spec/acceptance/fixtures/simple' }
 
     describe "::showvminfo" do
       it 'ensure vgrnt-test VM is running' do
@@ -49,7 +47,7 @@ describe Vgrnt::Util::VirtualBox do
     end
 
     describe "::machineSSH" do
-      let :machine_ssh_info do 
+      let :machine_ssh_info do
         in_vagrant_env { Vgrnt::Util::VirtualBox::machineSSH('default') }
       end
 

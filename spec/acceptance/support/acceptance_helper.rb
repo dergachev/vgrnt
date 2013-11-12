@@ -27,25 +27,37 @@ module AcceptanceExampleGroup
     capture(stream) { in_vagrant_env &block }
   end
 
+  def vagrant_stderr(&block)
+    capture_in_vagrant_env(:stderr, &block)
+  end
+
+  def vagrant_stdout(&block)
+    capture_in_vagrant_env(:stdout, &block)
+  end
+
   def delete_in_vagrant_env(file)
     in_vagrant_env { File.delete(file) if File.exists?(file) }
   end
 
-  def vagrant_up
-    in_vagrant_env do
+  def in_vagrant_env(&block)
+    in_vagrant_env_dir(vagrant_path, &block)
+  end
+
+  def vagrant_up(path)
+    in_vagrant_env_dir(path) do
       s = Vgrnt::Util::VirtualBox::runningMachines()
       # raise s['default'].inspect
       unless s && s['default'] && s['default'][:state] == 'running'
-         `vagrant up`
+         `VAGRANT_NO_PLUGINS=1 vagrant up`
       end
     end
   end
 
-  def vagrant_destroy
-    in_vagrant_env do
+  def vagrant_destroy(path)
+    in_vagrant_env_dir(path) do
       s = Vgrnt::Util::VirtualBox::runningMachines()
       if s && s['default'] && s['default'] && ([nil, "poweroff"].include? s['default'][:state])
-         `vagrant destroy -f`
+         `VAGRANT_NO_PLUGINS=1 vagrant destroy -f`
       end
     end
   end

@@ -79,7 +79,7 @@ module Vgrnt
 
     desc "ssh-config [vm-name]", "Store output of 'vagrant ssh-config' to .vgrnt-sshconfig"
     def ssh_config(target="default")
-      output = `vagrant ssh-config #{target}`
+      output = `VAGRANT_NO_PLUGINS=1 vagrant ssh-config #{target}`
       if $? && !output.empty?
         IO.write('.vgrnt-sshconfig', output)
         @logger.notice "Created ./.vgrnt-sshconfig with the following: " + output

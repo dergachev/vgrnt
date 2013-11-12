@@ -24,12 +24,6 @@ end
 
 describe Vgrnt::Util::VirtualBox do
 
-  describe "::showvminfo" do
-    it 'ensure vgrnt-test VM is running' do
-      expect(Vgrnt::Util::VirtualBox::showvminfo('vgrnt-test')).to include 'UUID'
-    end
-  end
-    
   context "when running from ./spec/acceptance/fixtures/simple" do
     def in_vagrant_env(&block)
       in_vagrant_env_dir './spec/acceptance/fixtures/simple', &block
@@ -37,6 +31,12 @@ describe Vgrnt::Util::VirtualBox do
 
     before(:all) { vagrant_up }
 
+    describe "::showvminfo" do
+      it 'ensure vgrnt-test VM is running' do
+        expect(Vgrnt::Util::VirtualBox::showvminfo('vgrnt-test')).to include 'UUID'
+      end
+    end
+    
     describe "::runningMachines" do
       it 'ensure .vgrnt directory exists' do
         expect(in_vagrant_env { File.exists? '.vagrant' }).to be_true

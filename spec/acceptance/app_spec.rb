@@ -8,12 +8,12 @@ describe Vgrnt::App do
 
     describe "#ssh" do
       it 'works with default VM specified explicitly' do
-        output = vagrant_stdout { Vgrnt::App.start(['ssh', 'default', '--', 'whoami']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{ssh default -- whoami}) }
         expect(output).to eq "vagrant\n"
       end
 
       it 'works with default VM specified implicitly' do
-        output = vagrant_stdout { Vgrnt::App.start(['ssh', '--',  'whoami']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{ssh -- whoami}) }
         expect(output).to eq "vagrant\n"
       end
     end
@@ -30,24 +30,24 @@ describe Vgrnt::App do
       end
 
       it "works with #ssh" do
-        output = vagrant_stdout { Vgrnt::App.start(['ssh', 'default', '--', 'whoami']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{ssh default -- whoami}) }
         expect(output).to eq "vagrant\n"
       end
     end
 
     describe "#vboxmanage" do
       it "runs displays usage when run with no arguments" do
-        output = vagrant_stdout { Vgrnt::App.start(['vboxmanage']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{vboxmanage}) }
         expect(output).to include "Usage:"
       end
 
       it "runs regular command (showvminfo)" do
-        output = vagrant_stdout { Vgrnt::App.start(['vboxmanage', 'default', '--', 'showvminfo']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{vboxmanage default -- showvminfo}) }
         expect(output).to match /Name.*vgrnt-test/
       end
 
       it "substitutes VM_UUID in irregular commands (guestproperty enumerate VM_UUID)" do
-        output = vagrant_stdout { Vgrnt::App.start(['vboxmanage', 'default', '--', 'guestproperty', 'enumerate', 'VM_UUID']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{vboxmanage default -- guestproperty enumerate VM_UUID}) }
         expect(output).to include "Name: /VirtualBox/GuestInfo/OS/Product"
       end
     end
@@ -55,7 +55,7 @@ describe Vgrnt::App do
     describe "#status" do
       it "correctly identifies running machines" do
         # default                   saved (virtualbox)
-        output = vagrant_stdout { Vgrnt::App.start(['status']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{status}) }
         expect(output).to match /default +running \(virtualbox\)/
       end
 
@@ -64,7 +64,7 @@ describe Vgrnt::App do
         vagrant_output = vagrant_stdout { puts `VAGRANT_NO_PLUGINS=1 vagrant status | grep '(virtualbox)$'` }
         expect(vagrant_output).to match /default +running \(virtualbox\)/
 
-        vgrnt_output = vagrant_stdout { Vgrnt::App.start(['status']) }
+        vgrnt_output = vagrant_stdout { Vgrnt::App.start(%w{status}) }
         expect(vgrnt_output).to include(vagrant_output)
       end
     end
@@ -77,7 +77,7 @@ describe Vgrnt::App do
     describe "#status" do
       it "correctly identifies not created machines" do
         # default                   saved (virtualbox)
-        output = vagrant_stdout { Vgrnt::App.start(['status']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{status}) }
         expect(output).to match /default +not created \(virtualbox\)/
       end
 
@@ -86,7 +86,7 @@ describe Vgrnt::App do
         vagrant_output = vagrant_stdout { puts `VAGRANT_NO_PLUGINS=1 vagrant status | grep '(virtualbox)$'` }
         expect(vagrant_output).to match /default +not created \(virtualbox\)/
 
-        vgrnt_output = vagrant_stdout { Vgrnt::App.start(['status']) }
+        vgrnt_output = vagrant_stdout { Vgrnt::App.start(%w{status}) }
         expect(vgrnt_output).to include(vagrant_output)
       end
     end
@@ -97,9 +97,9 @@ describe Vgrnt::App do
     let(:vagrant_path) { './spec/acceptance/fixtures/multivm' }
 
     describe "#status" do
-      it "correctly identifies MULTIPLE running machines" do
+      it "correctly identifies multiple running machines" do
         # default                   saved (virtualbox)
-        output = vagrant_stdout { Vgrnt::App.start(['status']) }
+        output = vagrant_stdout { Vgrnt::App.start(%w{status}) }
         expect(output).to match /^vm1 +running \(virtualbox\)/
         expect(output).to match /^vm2 +running \(virtualbox\)/
       end

@@ -149,10 +149,12 @@ cd spec/acceptance/fixtures/simple
 bundle exec vgrnt ssh -- 'ls /tmp'
 
 # run ALL the tests (not just unit)
+bundle exec rake acceptance:prepare  # spin up VMs to test against
 bundle exec rake spec
+bundle exec rake acceptance:clean  # destroy testing VMs
 
 # commit, push, and do a pull-request
 ```
 
-See [DEVNOTES.md](https://github.com/dergachev/vagrant-vboxmanage/blob/master/DEVNOTES.md)
+See [DEVNOTES.md](https://github.com/dergachev/vgrnt/blob/master/docs/DEVNOTES.md)
 for the notes I compiled while developing this plugin.

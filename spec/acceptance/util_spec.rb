@@ -34,7 +34,7 @@ describe Vgrnt::Util::VirtualBox do
         expect(Vgrnt::Util::VirtualBox::showvminfo('vgrnt-test')).to include 'UUID'
       end
     end
-    
+
     describe "::runningMachines" do
       it 'ensure .vgrnt directory exists' do
         expect(in_vagrant_env { File.exists? '.vagrant' }).to be_true

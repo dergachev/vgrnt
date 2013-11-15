@@ -24,7 +24,7 @@ module Vgrnt
     end
   end
 
-  #  Undoes the automatic removal of -- in Thor::Options.peek. Otherwise "vgrnt ssh precise -- ls /" 
+  #  Undoes the automatic removal of -- in Thor::Options.peek. Otherwise "vgrnt ssh precise -- ls /"
   #  is parsed as "precise ls /". TODO: is there a less hacky way to handle this?
   class ::Thor::Options
     def peek
@@ -60,10 +60,10 @@ module Vgrnt
         if machine && machine[:state] == 'running'
           # found by running "VAGRANT_LOG=debug vagrant ssh"
           default_ssh_args = [
-            "vagrant@#{ssh_info[:ssh_ip]}", 
-            "-p", ssh_info[:ssh_port], 
-            "-o", "DSAAuthentication=yes", "-o", "LogLevel=FATAL", "-o", "StrictHostKeyChecking=no", 
-            "-o", "UserKnownHostsFile=/dev/null", "-o", "IdentitiesOnly=yes", 
+            "vagrant@#{ssh_info[:ssh_ip]}",
+            "-p", ssh_info[:ssh_port],
+            "-o", "DSAAuthentication=yes", "-o", "LogLevel=FATAL", "-o", "StrictHostKeyChecking=no",
+            "-o", "UserKnownHostsFile=/dev/null", "-o", "IdentitiesOnly=yes",
             "-i", "~/.vagrant.d/insecure_private_key"
           ]
 
@@ -151,7 +151,7 @@ module Vgrnt
         # TODO: handle substitution for commands like `usbfilter add 0 --target <uuid|name>`
 
         @logger.debug "Non-standard vboxmanage command detected (#{vboxmanage_subcommand}). Substituting 'VM_ID' for VM id."
-        
+
         # [VM_ID] is an optional literal token which will be replaced by the UUID of the VM referenced by Vagrant
         args.map! { |a| a == 'VM_UUID' ? machine[:id] : a }
         command = (["VBoxManage", vboxmanage_subcommand] + args).join(" ")

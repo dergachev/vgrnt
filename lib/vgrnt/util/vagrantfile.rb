@@ -1,37 +1,35 @@
-# TODO: test me
-
-$vagrant_config_vms = []
-
-module Vagrant
-  def self.configure(*args, &block)
-    yield Vgrnt::Util::Vagrantfile::Proxy.new
-  end
-end
-
 module Vgrnt
   module Util
     module Vagrantfile
-      class Proxy
-        def define(*args)
-          # $stderr.puts "Called define with args (#{args.join(", ")})"
-          $vagrant_config_vms << args.first
-        end
 
-        def method_missing(name, *args, &block)
-          return self
-        end
+      def self.defined_vms(path = nil)
+        Vagrant.eval_vagrantfile(path)
       end
 
-      def self.defined_vms
-        # clear any previous value (else tests fail depending on exec order)
-        # NOT PARALLEL SAFE (not sure how to do this given static methods)
-        $vagrant_config_vms = []
-        load('./Vagrantfile')
-        # puts $vagrant_config_vms.inspect
-        if $vagrant_config_vms.empty?
-          $vagrant_config_vms << :default
+      module Vagrant
+        def self.eval_vagrantfile(path = nil)
+          # NOT THREAD SAFE (not sure how to do this given static methods)
+          @@vagrant_config_vms = []
+
+          # eval Vagrantfile inside of Vgrnt::Util::Vagrantfile namespace
+          module_eval(File.read(path || './Vagrantfile'))
+
+          @@vagrant_config_vms << :default if @@vagrant_config_vms.empty?
+          return @@vagrant_config_vms
         end
-        return $vagrant_config_vms
+
+        def self.configure(*args, &block)
+          yield self
+        end
+
+        def self.define(*args)
+          @@vagrant_config_vms << args.first
+        end
+
+        # stub out anything else
+        def self.method_missing(*args)
+          return self
+        end
       end
     end
   end

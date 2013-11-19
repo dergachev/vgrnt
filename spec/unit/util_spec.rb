@@ -33,4 +33,22 @@ describe Vgrnt::Util::Vagrantfile do
       it { should eq [:fake_managed_server, :my_server] }
     end
   end
+
+  describe "Vagrant::_remove_named_arguments" do
+    def process(input)
+      Vgrnt::Util::Vagrantfile::Vagrant._remove_named_arguments(input)
+    end
+    it "works with simple named arguments" do
+      expect(process 'meth 1, scope: "meh", arg2: "meh"').to eq 'meth 1, "meh", "meh"'
+    end
+    it "works with space-free named arguments" do
+      expect(process 'meth 1, scope:"meh", arg2:"meh"').to eq 'meth 1, "meh", "meh"'
+    end
+    it "leaves symbols alone" do
+      expect(process 'meth :bob, 1, sum(:three)').to eq 'meth :bob, 1, sum(:three)'
+    end
+  end
 end
+
+# describe Vgrnt::Util::Vagrantfile do
+# end

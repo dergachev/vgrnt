@@ -3,16 +3,25 @@ module Vgrnt
     module Vagrantfile
 
       def self.defined_vms(path = nil)
-        Vagrant.eval_vagrantfile(path)
+        Vagrant._eval_vagrantfile(path)
       end
 
       module Vagrant
-        def self.eval_vagrantfile(path = nil)
+        def self._remove_named_arguments(source)
+          source = source.gsub(/([\s\(,])[a-zA-Z0-9_]+: ?/, '\1')
+          return source
+        end
+
+        # eval Vagrantfile inside of Vgrnt::Util::Vagrantfile namespace
+        def self._eval_vagrantfile(path = nil)
           # NOT THREAD SAFE (not sure how to do this given static methods)
           @@vagrant_config_vms = []
 
-          # eval Vagrantfile inside of Vgrnt::Util::Vagrantfile namespace
-          module_eval(File.read(path || './Vagrantfile'))
+          vgrntfile_source = File.read(path || './Vagrantfile')
+          if RUBY_VERSION.to_f <= 1.8
+            vgrntfile_source = Vagrant::_remove_named_arguments(vgrntfile_source)
+          end
+          module_eval(vgrntfile_source)
 
           @@vagrant_config_vms << :default if @@vagrant_config_vms.empty?
           return @@vagrant_config_vms

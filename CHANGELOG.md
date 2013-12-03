@@ -1,3 +1,18 @@
+## [0.0.4](https://github.com/dergachev/vagrant/compare/v0.0.3...v0.0.4) (Dec 3, 2013)
+
+BUGFIX:
+
+  - Fix `vgrnt ssh` hanging due to improper shellout technique.
+
+FEATURES:
+
+  - Added support for `vgrnt status`
+
+IMPROVEMENTS:
+
+  - Refactored codebase a bit
+  - Implemented acceptance tests (unit tests still non-existant)
+
 ## [0.0.3](https://github.com/dergachev/vagrant/compare/v0.0.2...v0.0.3) (Nov 12, 2013)
 
 FEATURES:

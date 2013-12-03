@@ -74,7 +74,14 @@ module Vgrnt
         end
       end
 
-      puts `#{ssh_command}`
+      # Using IO.popen is important:
+      # - POpen3 ignores STDIN. Backticks buffer stdout. Kernel::exec breaks rspec.
+      # - getc instead of gets fixes the 1 line lag.
+      IO.popen(ssh_command) do |io|
+        while c = io.getc do 
+          putc c
+        end
+      end
     end
 
     desc "ssh-config [vm-name]", "Store output of 'vagrant ssh-config' to .vgrnt-sshconfig"

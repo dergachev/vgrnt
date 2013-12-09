@@ -1,28 +1,10 @@
 require 'thor'
 require 'open3'
+require 'vgrnt/util/logger'
 require 'vgrnt/util/virtualbox'
 require 'vgrnt/util/vagrantfile'
 
 module Vgrnt
-  class Logger
-
-    def stdout(str)
-      $stdout.puts str unless str.empty?
-    end
-
-    def notice(str)
-      $stderr.puts str unless str.empty?
-    end
-
-    def debug(str)
-      $stderr.puts str if !str.empty? && ENV['VAGRANT_LOG'] == 'debug'
-    end
-
-    def error(str)
-      # terminal codes for red
-      $stderr.puts "\e[31m" + str + "\e[0m" unless str.empty?
-    end
-  end
 
   #  Undoes the automatic removal of -- in Thor::Options.peek. Otherwise "vgrnt ssh precise -- ls /"
   #  is parsed as "precise ls /". TODO: is there a less hacky way to handle this?
@@ -32,12 +14,11 @@ module Vgrnt
     end
   end
 
-
   class App < Thor
 
     def initialize(*args)
       super(*args)
-      @logger = Logger.new
+      @logger = Vgrnt::Util::Logger
     end
 
     desc "ssh [vm-name] [-- extra ssh args]", "Runs vagrant ssh without bootstrapping vagrant."

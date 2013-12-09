@@ -77,6 +77,16 @@ vgrnt vboxmanage metrics query VM_ID
 # =>    VBoxManage metrics query 0398e43a-d35f-4c84-bc81-6807f5d11262
 ```
 
+### vgrnt np
+
+Same as `VAGRANT_NO_PLUGINS=1 vagrant <args>`. Useful for speeding up any
+command `vgrnt` doesn't support.
+
+```
+vgrnt np provision
+# Executing "VAGRANT_NO_PLUGINS=1 vagrant provision"
+```
+
 ## Installation
 
 vgrnt *should not* be installed as a vagrant plugin. Instead, just install the gem:

@@ -68,6 +68,17 @@ describe Vgrnt::App do
         expect(vgrnt_output).to include(vagrant_output)
       end
     end
+
+    describe "#np" do
+      it "'np status' is identical to 'vagrant status'", :slow do
+        # default                   saved (virtualbox)
+        vagrant_output = vagrant_stdout { puts `VAGRANT_NO_PLUGINS=1 vagrant status | grep '(virtualbox)$'` }
+        expect(vagrant_output).to match /default +running \(virtualbox\)/
+
+        vgrnt_output = vagrant_stdout { Vgrnt::App.start(%w{np status}) }
+        expect(vgrnt_output).to include(vagrant_output)
+      end
+    end
   end
 
   context "when running from ./spec/acceptance/fixtures/neveron" do

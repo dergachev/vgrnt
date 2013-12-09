@@ -90,6 +90,13 @@ module Vgrnt
       end
     end
 
+    desc "np [args]", "Executes 'VAGRANT_NO_PLUGINS=1 vagrant [args ...]'"
+    def np(*args)
+      command = (["VAGRANT_NO_PLUGINS=1", "vagrant" ] + args).join(" ")
+      Vgrnt::Util::Exec.popen3(command,@logger)
+    end
+
+
     # desc "provision", "Run vagrant provision like last time"
     # def provision
     #   raise "Not implemented yet. Likely requires creating vagrant-vgrnt."

@@ -3,6 +3,8 @@ require 'open3'
 require 'vgrnt/util/logger'
 require 'vgrnt/util/virtualbox'
 require 'vgrnt/util/vagrantfile'
+require 'vgrnt/util/exec'
+
 
 module Vgrnt
 
@@ -55,14 +57,7 @@ module Vgrnt
         end
       end
 
-      # Using IO.popen is important:
-      # - POpen3 ignores STDIN. Backticks buffer stdout. Kernel::exec breaks rspec.
-      # - getc instead of gets fixes the 1 line lag.
-      IO.popen(ssh_command) do |io|
-        while c = io.getc do 
-          putc c
-        end
-      end
+      Vgrnt::Util::Exec.popen(ssh_command)
     end
 
     desc "ssh-config [vm-name]", "Store output of 'vagrant ssh-config' to .vgrnt-sshconfig"
@@ -147,10 +142,7 @@ module Vgrnt
 
       @logger.debug "Executing: #{command}"
       #TODO: windows support (path to VBoxManage.exe")
-      Open3.popen3(command) do |stdin, stdout, stderr|
-        @logger.stdout stdout.read
-        @logger.error stderr.read
-      end
+      Vgrnt::Util::Exec.popen3(command, @logger)
     end
   end
 end

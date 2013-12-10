@@ -14,7 +14,7 @@ module Vgrnt
       end
       
       # used when we want to capture stdout, stderr separately and don't care about buffering on stdin
-      def self.popen3(command, logger = nil)
+      def self.popen3(command, logger = Vgrnt::Util::Logger)
         Open3.popen3(command) do |stdin, stdout, stderr|
           logger.stdout stdout.read
           logger.error stderr.read
@@ -22,8 +22,8 @@ module Vgrnt
       end
       
       def self.exec(command)
-        # FIXME: stop using exec, it's too hard to test
         raise "NOT IMPLEMENTED"
+        # FIXME: stop using exec, it's too hard to test without stubbing
         exec(command)
       end
     end

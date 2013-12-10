@@ -28,6 +28,9 @@ module AcceptanceExampleGroup
   end
 
   def vagrant_stderr(&block)
+    # stubbing because IO.popen in Vgrnt::Util::Exec prevents stderr from being capturable.
+    Vgrnt::Util::Exec.stub(:popen) { |cmd| Vgrnt::Util::Exec.popen3(cmd) }
+
     capture_in_vagrant_env(:stderr, &block)
   end
 

@@ -16,6 +16,11 @@ describe Vgrnt::App do
         output = vagrant_stdout { Vgrnt::App.start(%w{ssh -- whoami}) }
         expect(output).to eq "vagrant\n"
       end
+
+      it 'preserves stderr' do
+        output = vagrant_stderr { Vgrnt::App.start(%w{ssh -- grep --bob }) }
+        expect(output).to include "grep: unrecognized option '--bob'"
+      end
     end
 
     describe "#ssh-config", :slow do
@@ -26,6 +31,7 @@ describe Vgrnt::App do
       it 'with default VM specified explicitly' do
         expect( in_vagrant_env { File.exists? '.vgrnt-sshconfig' } ).to be_false
         stderr = vagrant_stderr { Vgrnt::App.start(%w{ssh-config default}) }
+        expect(stderr).to include "Created ./.vgrnt-sshconfig with the following: Host default"
         expect( in_vagrant_env { File.exists? '.vgrnt-sshconfig' } ).to be_true
       end
 

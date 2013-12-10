@@ -93,7 +93,7 @@ module Vgrnt
     desc "np [args]", "Executes 'VAGRANT_NO_PLUGINS=1 vagrant [args ...]'"
     def np(*args)
       command = (["VAGRANT_NO_PLUGINS=1", "vagrant" ] + args).join(" ")
-      Vgrnt::Util::Exec.popen3(command,@logger)
+      Vgrnt::Util::Exec.popen(command)
     end
 
 
@@ -149,7 +149,7 @@ module Vgrnt
 
       @logger.debug "Executing: #{command}"
       #TODO: windows support (path to VBoxManage.exe")
-      Vgrnt::Util::Exec.popen3(command, @logger)
+      Vgrnt::Util::Exec.popen(command)
     end
   end
 end

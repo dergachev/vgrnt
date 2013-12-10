@@ -1,3 +1,16 @@
+## [0.0.5](https://github.com/dergachev/vagrant/compare/v0.0.4...v0.0.5) (Dec 10, 2013)
+
+FEATURES:
+
+  - Added 'vgrnt np' support.
+
+IMPROVEMENTS:
+
+  - Refactored codebase a bit:
+    - Extracted shelling out logic into Vgrnt::Util::Exec
+    - Extracted logger helpers into Vgrnt::Util::Logger
+    - Improved Vgrnt::Util::Exec to allow capturing of stderr for testing
+
 ## [0.0.4](https://github.com/dergachev/vagrant/compare/v0.0.3...v0.0.4) (Dec 3, 2013)
 
 BUGFIX:

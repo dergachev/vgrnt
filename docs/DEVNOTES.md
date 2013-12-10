@@ -12,7 +12,7 @@ cd ~/code/vgrnt
 
 # after making code changes, increment version number, build the gem locally
 vim lib/vgrnt/version.rb +/VERSION # increment version counter, eg to 0.0.3
-rake build  # package the gem into ./pkg/vgrnt-0.0.3.gem
+bundle exec rake build  # package the gem into ./pkg/vgrnt-0.0.3.gem
 
 # install and test the gem locally
 gem uninstall vgrnt
@@ -24,8 +24,7 @@ vgrnt ssh -- ls /
 vim CHANGELOG.md      # add v0.0.3 details
 git commit -m "Publishing v0.0.3" CHANGELOG.md lib/vgrnt/version.rb
 
-rake release
-git push --tags
+bundle exec rake release
 ```
 
 ## Creating a gem
